@@ -1,0 +1,5 @@
+{% if path %}
+<svg width="{{ size|default:18 }}" height="{{ size|default:18 }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{{ path|safe }}</svg>
+{% else %}
+<svg width="{{ size|default:18 }}" height="{{ size|default:18 }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/></svg>
+{% endif %}

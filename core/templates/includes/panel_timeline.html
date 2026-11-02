@@ -1,0 +1,20 @@
+{% load mg_tags %}
+<div class="panel">
+  <div class="panel__head">
+    <div class="panel__title">{{ title|default:"So'nggi muhim voqealar" }}</div>
+    {% if more_url %}<a class="panel__more" href="{{ more_url }}">Barchasini ko'rish {% svg 'arrow' 13 %}</a>{% endif %}
+  </div>
+  <div class="timeline">
+    {% for item in items %}
+      <a class="tl-item" href="{{ item.url }}">
+        <div class="tl-item__img ph" style="background:{% if item.image %}url('{{ item.image.url }}') center/cover{% else %}{{ item.title|gradient }}{% endif %}"></div>
+        <div>
+          <div class="tl-item__date">{% if item.date %}{{ item.date }}{% else %}—{% endif %}</div>
+          <div class="tl-item__text">{{ item.title }}</div>
+        </div>
+      </a>
+    {% empty %}
+      <div class="empty" style="padding:22px 12px"><div class="empty__icon">📭</div>Hozircha ma'lumot yo'q</div>
+    {% endfor %}
+  </div>
+</div>

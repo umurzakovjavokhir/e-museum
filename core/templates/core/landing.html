@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Milliy gvardiya elektron tarixiy muzey{% endblock %}
+
+{% block landing %}
+<div class="landing">
+  <div class="topbar">
+    <div class="topbar__logo">✦</div>
+    <div>
+      <div class="topbar__title">MILLIY GVARDIYA</div>
+      <div class="topbar__sub">ELEKTRON TARIXIY MUZEY · 2017–2026</div>
+    </div>
+    <nav class="topbar__nav">
+      <a class="is-active" href="{% url 'core:landing' %}">Bosh sahifa</a>
+      <a href="{% url 'core:yonalishlar' %}">10 yo'nalish</a>
+      <a href="{% url 'core:yillar' %}">Yillar arxivi</a>
+      <a href="{% url 'core:hujjatlar' %}">Manbalar</a>
+      <a href="#" onclick="window.print();return false;">Chop etish</a>
+    </nav>
+  </div>
+
+  <div class="landing__wrap">
+    <div class="landing__hero">
+      <div class="landing__eyebrow">RAQAMLI TARIXIY MEROS · 2017—2026</div>
+      <h1 class="landing__title">TARIX. <span>TARAQQIYOT.</span><br>JASORAT.</h1>
+      <p class="landing__lead">O'zbekiston Respublikasi Milliy gvardiyasining tashkil topishi, shakllanishi, huquqiy asoslari, islohotlari va xizmat faoliyatiga bag'ishlangan interaktiv elektron muzey. Tarixiy xotirani saqlash, arxivlarni raqamlashtirish va kelajak avlodga etkazish uchun yagona axborot makoni.</p>
+      <div class="landing__cta">
+        <a class="landing__btn" href="{% url 'core:home' %}">Muzeyni ko'rish →</a>
+        <a class="landing__btn landing__btn--ghost" href="{% url 'core:yillar' %}">Yilni tanlash</a>
+      </div>
+    </div>
+
+    <div class="landing__stats">
+      <div class="lstat"><div class="lstat__val">10</div><div class="lstat__lbl">Asosiy yo'nalish</div></div>
+      <div class="lstat"><div class="lstat__val">10 yil</div><div class="lstat__lbl">Tarixiy davr: 2017–2026</div></div>
+      <div class="lstat"><div class="lstat__val">Rasmiy</div><div class="lstat__lbl">Manbalarga havolalar</div></div>
+      <div class="lstat"><div class="lstat__val">24/7</div><div class="lstat__lbl">Raqamli kirish — keyingi bosqich</div></div>
+    </div>
+
+    <h2 class="section-title" style="margin-top:0">Yillar kesimida elektron arxiv</h2>
+    <p class="text-muted" style="font-size:13px;margin-bottom:14px">Yilni tanlang — shu davrga oid ochiq manbalarda tasdiqlangan voqealar va hujjatlar ko'rsatiladi</p>
+    <div class="year-strip" style="margin-bottom:28px">
+      {% for y in years %}
+        <a class="year-btn" href="{% url 'core:yil_detail' y %}" style="border-color:#23483a;background:#08201a;color:#cfe4da">{{ y }}</a>
+      {% endfor %}
+    </div>
+
+    <h2 class="section-title">10 ta asosiy yo'nalish</h2>
+    <div class="dir-grid">
+      {% for d in directions %}
+      <a class="dir" href="{% url 'core:yonalishlar' %}">
+        <div class="dir__num">{{ d.number|stringformat:"02d" }}</div>
+        <div>
+          <div class="dir__title">{{ d.title }}</div>
+          <div class="dir__text">{{ d.description|truncatechars:220 }}</div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="empty" style="grid-column:1/-1;border-color:#23483a;color:#93b3a6"><div class="empty__icon">🧭</div>Yo'nalishlar yuklanmoqda...</div>
+      {% endfor %}
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:34px;flex-wrap:wrap">
+      <a class="landing__btn" href="{% url 'core:home' %}">Bosh sahifaga o'tish →</a>
+      <a class="landing__btn landing__btn--ghost" href="/admin/">Boshqaruv paneli</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

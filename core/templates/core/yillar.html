@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Yillar bo'yicha tarix — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>Yillar bo'yicha tarix</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="page-title">Yillar bo'yicha tarix</h1>
+  <p class="page-sub">Milliy gvardiyaning tashkil etilishi, rivojlanish bosqichlari, muhim voqealar, yangi binolar, bo'linmalar va erishilgan natijalar yillar kesimida.</p>
+  <div class="year-strip" style="margin-bottom:0">
+    {% for y in years %}
+      <a class="year-btn{% if y == active_year %} is-active{% endif %}" href="{% url 'core:yil_detail' y %}">{{ y }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="year-hero mb-16">
+  <div class="year-hero__card">
+    <div class="year-hero__num">{{ archive.year }}</div>
+    <div class="year-hero__name">{{ archive.title }}</div>
+    <p class="text-muted" style="font-size:13px;line-height:1.65">{{ archive.description }}</p>
+    <div class="year-stats">
+      <div class="year-stat">
+        <div class="year-stat__icon">🏛️</div>
+        <div><div class="year-stat__val">{{ archive.new_buildings }}</div><div class="year-stat__lbl">Yangi bino va inshoot</div></div>
+      </div>
+      <div class="year-stat">
+        <div class="year-stat__icon">🛡️</div>
+        <div><div class="year-stat__val">{{ archive.new_departments }}</div><div class="year-stat__lbl">Yangi bo'linma</div></div>
+      </div>
+      <div class="year-stat">
+        <div class="year-stat__icon">🏆</div>
+        <div><div class="year-stat__val">{{ archive.achievements }}</div><div class="year-stat__lbl">Erishilgan g'alaba</div></div>
+      </div>
+      <div class="year-stat">
+        <div class="year-stat__icon">📄</div>
+        <div><div class="year-stat__val">{{ archive.documents }}</div><div class="year-stat__lbl">Hujjat va material</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="video-card">
+    <div class="ph" style="background:{% if archive.image %}url('{{ archive.image.url }}') center/cover{% else %}{{ archive.year|gradient }}{% endif %};position:absolute;inset:0"></div>
+    <a class="video-card__play" href="{% url 'core:yil_detail' archive.year %}" title="Asosiy voqealar">{% svg 'play' 24 %}</a>
+    <div class="video-card__bar">
+      <span>{% svg 'play' 15 %} {{ archive.year }}-yil — asosiy voqealar</span>
+      <span class="video-card__expand">{% svg 'expand' 15 %}</span>
+    </div>
+  </div>
+
+  <div class="panel" style="margin:0">
+    <div class="panel__head">
+      <div class="panel__title">Yilning muhim sanalari</div>
+      <a class="panel__more" href="{% url 'core:sanalar' %}">Barchasini ko'rish {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="timeline">
+      {% for d in dates %}
+      <a class="tl-item" href="{{ d.get_absolute_url }}">
+        <div class="tl-item__img ph" style="background:{% if d.image %}url('{{ d.image.url }}') center/cover{% else %}{{ d.title|gradient }}{% endif %}"></div>
+        <div>
+          <div class="tl-item__date">{{ d.date }}</div>
+          <div class="tl-item__text">{{ d.title }}</div>
+        </div>
+      </a>
+      {% empty %}
+      <div class="empty" style="padding:22px 12px"><div class="empty__icon">📅</div>Bu yilda muhim sanalar yo'q</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="panel" style="padding:18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px">
+    <h2 class="section-title" style="margin:0">{{ archive.year }}-yil materiallari</h2>
+    <div class="toolbar" style="margin:0">
+      <form method="get" style="display:flex;gap:9px;flex-wrap:wrap">
+        <input type="hidden" name="yil" value="{{ active_year }}">
+        <input type="search" name="q" value="{{ search }}" placeholder="{{ archive.year }}-yil materiallari ichida qidiruv...">
+        <select name="sort">
+          <option value="date"{% if sort == 'date' %} selected{% endif %}>Sanasi bo'yicha</option>
+          <option value="views"{% if sort == 'views' %} selected{% endif %}>Ko'rishlar bo'yicha</option>
+        </select>
+        <button class="btn" type="submit">{% svg 'filter' 13 %} Filtrlar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="chips">
+    <a class="chip{% if not kind %} is-active{% endif %}" href="?yil={{ active_year }}">Barcha <b style="margin-left:6px">{{ counts.barcha }}</b></a>
+    <a class="chip{% if kind == 'building' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=building">Yangi binolar <b style="margin-left:6px">{{ counts.building }}</b></a>
+    <a class="chip{% if kind == 'bolinma' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=bolinma">Bo'linmalar <b style="margin-left:6px">{{ counts.bolinma }}</b></a>
+    <a class="chip{% if kind == 'tadbir' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=tadbir">Tadbirlar <b style="margin-left:6px">{{ counts.tadbir }}</b></a>
+    <a class="chip{% if kind == 'galaba' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=galaba">Erishilgan g'alabalar <b style="margin-left:6px">{{ counts.galaba }}</b></a>
+    <a class="chip{% if kind == 'hujjat' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=hujjat">Hujjatlar <b style="margin-left:6px">{{ counts.hujjat }}</b></a>
+    <a class="chip{% if kind == 'foto' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=foto">Foto <b style="margin-left:6px">{{ counts.foto }}</b></a>
+    <a class="chip{% if kind == 'video' %} is-active{% endif %}" href="?yil={{ active_year }}&tur=video">Video <b style="margin-left:6px">{{ counts.video }}</b></a>
+  </div>
+
+  <div class="grid grid--4">
+    {% for m in materials %}
+    <a class="card" href="{{ m.url }}">
+      <div class="card__media" style="aspect-ratio:16/10">
+        <div class="ph" style="background:{% if m.image %}url('{{ m.image.url }}') center/cover{% else %}{{ m.title|gradient }}{% endif %}"></div>
+        <span class="card__type" style="background:{% if m.kind == 'galaba' %}#b45309{% elif m.kind == 'hujjat' %}#6d28d9{% elif m.kind == 'tadbir' %}#0f766e{% elif m.kind == 'building' %}#1d4ed8{% else %}#334155{% endif %}">{{ m.kind_label }}</span>
+      </div>
+      <div class="card__body">
+        <div class="card__title">{{ m.title }}</div>
+        {% if m.date %}<div class="card__date">{{ m.date }}</div>{% endif %}
+      </div>
+      <div class="card__meta">
+        <span>{% svg 'camera' 12 %} {{ m.photos }}</span>
+        <span>{% svg 'video' 12 %} {{ m.videos }}</span>
+        <span>{% svg 'file' 12 %} {{ m.docs }}</span>
+        <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+      </div>
+    </a>
+    {% empty %}
+    <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🗂️</div>Materiallar topilmadi</div>
+    {% endfor %}
+  </div>
+</div>
+
+<div style="display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap">
+  {% if prev_year %}<a class="btn" href="{% url 'core:yil_detail' prev_year %}">{% svg 'chevL' 14 %} {{ prev_year }}-yil</a>{% else %}<span></span>{% endif %}
+  {% if next_year %}<a class="btn" href="{% url 'core:yil_detail' next_year %}">{{ next_year }}-yil {% svg 'chev' 14 %}</a>{% endif %}
+</div>
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">Yillar ro'yxati</div></div>
+    <div class="mini-list">
+      {% for y in years %}
+      <a class="mini" href="{% url 'core:yil_detail' y %}">
+        <span class="mini__img" style="display:grid;place-items:center;font-weight:800;color:var(--gold);background:{{ y|gradient }}">{{ y }}</span>
+        <span><div class="mini__title">{{ y }}-yil arxivi</div><div class="mini__sub">Elektron arxiv materiallari</div></span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</aside>
+{% endblock %}

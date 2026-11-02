@@ -1,0 +1,115 @@
+{% load static %}{% load mg_tags %}<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE_TITLE }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'><img src="{% static 'img/ico.png' %}"></text></svg>">
+</head>
+<body>
+{% if active == 'landing' %}
+  {% block landing %}{% endblock %}
+{% else %}
+
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="{% url 'core:home' %}">
+    <div class="brand__logo"><img src="{% static 'img/ico.png' %}"></div>
+    <div class="brand__text">
+      <div class="brand__title">Milliy gvardiya<br>elektron muzeyi</div>
+      <div class="brand__subtitle">Tarix · Xotira · Faxr</div>
+    </div>
+  </a>
+
+  <nav class="nav">
+    {% for item in MENU %}
+      {% with url_name=item.url|split:':' %}
+      <a class="nav__item{% if active == url_name.1 %} is-active{% endif %}" href="{% url item.url %}">
+        {% svg item.icon %} <span>{{ item.name }}</span>
+      </a>
+      {% endwith %}
+    {% endfor %}
+
+    <div class="nav__divider"></div>
+
+    <a class="nav__item{% if active == 'qidiruv' %} is-active{% endif %}" href="{% url 'core:qidiruv' %}">
+      {% svg 'search' %} <span>Qidiruv</span>
+    </a>
+    <a class="nav__item{% if active == 'saqlanganlar' %} is-active{% endif %}" href="{% url 'core:saqlanganlar' %}">
+      {% svg 'bookmark' %} <span>Saqlanganlar</span>
+      <span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent-2)">{{ BOOKMARK_COUNT }}</span>
+    </a>
+    <a class="nav__item{% if active == 'landing' %} is-active{% endif %}" href="{% url 'core:landing' %}">
+      {% svg 'flag' %} <span>Loyiha sahifasi</span>
+    </a>
+  </nav>
+
+  <div class="sidebar__memorial" title="Milliy gvardiya xotirasi"></div>
+</aside>
+
+<div class="shell">
+  <header class="header">
+    <button class="burger" id="burger" aria-label="Menyu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+
+    <form class="search" action="{% url 'core:qidiruv' %}" method="get">
+      <span class="search__icon">{% svg 'search' 17 %}</span>
+      <input type="search" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Arxivdan qidirish... (masalan: 2023, bino, bo'linma, tadbir, shaxs, hujjat)">
+    </form>
+
+    <div class="header__right">
+      <button class="lang">{% svg 'globe' 15 %} UZ {% svg 'chevD' 13 %}</button>
+      <button class="bell" title="Bildirishnomalar">{% svg 'bell' 17 %}<span class="bell__count">3</span></button>
+      <div class="user">
+        <div class="user__avatar">👤</div>
+        <div class="user__meta">
+          <div class="user__name">Administrator</div>
+          <div class="user__role">Tizim administratori</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout{% block layout_class %}{% endblock %}">
+    <div>
+      {% block breadcrumb %}{% endblock %}
+      {% block content %}{% endblock %}
+    </div>
+    {% block rightbar %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div><b>Milliy gvardiya elektron muzeyi</b> — Tarix, xotira va faxr raqamli meros platformasi. © 2017—2026</div>
+    <div>Ma'lumotlar rasmiy manbalarga asosan joylashtiriladi · <a href="/admin/" class="text-accent">Boshqaruv paneli</a></div>
+  </footer>
+</div>
+
+{% if messages %}
+<div class="messages">
+  {% for m in messages %}<div class="msg">{{ m }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<script>
+(function(){
+  var b = document.getElementById('burger');
+  if (b) b.addEventListener('click', function(){
+    document.getElementById('sidebar').classList.toggle('is-open');
+  });
+  document.querySelectorAll('.thumb').forEach(function(t){
+    t.addEventListener('click', function(){
+      var main = t.closest('.gallery').querySelector('.gallery__main');
+      var img = main.querySelector('img');
+      var src = t.getAttribute('data-src');
+      if (img && src) img.src = src;
+      t.closest('.thumbs').querySelectorAll('.thumb').forEach(function(x){x.classList.remove('is-active')});
+      t.classList.add('is-active');
+    });
+  });
+})();
+</script>
+{% block scripts %}{% endblock %}
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Qidiruv — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>Qidiruv</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="page-title">Qidiruv</h1>
+  <p class="page-sub">Arxivdan yil, bino, bo'linma, tadbir, shaxs, hujjat va boshqa materiallar bo'yicha qidiruv.</p>
+  <form method="get" class="search" style="max-width:100%;margin-top:16px">
+    <span class="search__icon">{% svg 'search' 17 %}</span>
+    <input type="search" name="q" value="{{ q }}" placeholder="Masalan: 2023, bino, bo'linma, tadbir, shaxs, hujjat" autofocus>
+  </form>
+</section>
+
+<div class="chips">
+  <span class="text-muted" style="font-size:12.5px">
+    {% if q %}<b class="text-accent">{{ count }}</b> ta natija topildi: «{{ q }}»{% else %}Qidiruv so'rovini kiriting{% endif %}
+  </span>
+</div>
+
+<div class="grid grid--3">
+  {% for r in results %}
+  <a class="card" href="{{ r.url }}">
+    <div class="card__media" style="aspect-ratio:16/9">
+      <div class="ph" style="background:{% if r.image %}url('{{ r.image.url }}') center/cover{% else %}{{ r.title|gradient }}{% endif %}"></div>
+      <span class="card__type" style="background:#1d4ed8">{{ r.kind }}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ r.title }}</div>
+      {% if r.date %}<div class="card__date">{{ r.date }}</div>{% endif %}
+      {% if r.meta %}<div class="card__date">{{ r.meta }}</div>{% endif %}
+    </div>
+    <div class="card__meta">
+      <span>{% svg 'search' 12 %} Qidiruv natijasi</span>
+      <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1">
+    <div class="empty__icon">🔍</div>
+    {% if q %}«{{ q }}» bo'yicha natija topilmadi{% else %}Qidirish uchun so'rov kiriting{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">Qidiruv bo'yicha maslahatlar</div></div>
+    <div class="mini-list">
+      <div class="mini"><span class="mini__img" style="display:grid;place-items:center;font-size:18px">📅</span><span><div class="mini__title">Yil bo'yicha</div><div class="mini__sub">2017, 2020, 2023</div></span></div>
+      <div class="mini"><span class="mini__img" style="display:grid;place-items:center;font-size:18px">🏛️</span><span><div class="mini__title">Bino bo'yicha</div><div class="mini__sub">poliklinika, o'quv markazi</div></span></div>
+      <div class="mini"><span class="mini__img" style="display:grid;place-items:center;font-size:18px">🛡️</span><span><div class="mini__title">Bo'linma bo'yicha</div><div class="mini__sub">qo'riqlash, logistika</div></span></div>
+      <div class="mini"><span class="mini__img" style="display:grid;place-items:center;font-size:18px">🏆</span><span><div class="mini__title">G'alaba bo'yicha</div><div class="mini__sub">musobaqa, mukofot</div></span></div>
+      <div class="mini"><span class="mini__img" style="display:grid;place-items:center;font-size:18px">📄</span><span><div class="mini__title">Hujjat bo'yicha</div><div class="mini__sub">buyruq, farmoyish raqami</div></span></div>
+    </div>
+  </div>
+</aside>
+{% endblock %}

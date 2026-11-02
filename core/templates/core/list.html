@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}{{ title }} — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>{{ title }}</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero{% if hero_gold %} hero--gold{% endif %}">
+  <h1 class="page-title">{{ title }}</h1>
+  <p class="page-sub">{{ subtitle }}</p>
+</section>
+
+{% if stats %}
+<div class="stats">
+  {% for s in stats %}
+  <div class="stat">
+    <div class="stat__icon" style="background:{{ s.color }}22;border:1px solid {{ s.color }}55">{{ s.icon }}</div>
+    <div><div class="stat__value">{{ s.value }}</div><div class="stat__label">{{ s.label }}</div></div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if years %}
+<div class="chips">
+  <a class="chip{% if not active_year %} is-active{% endif %}" href="?{% if tur %}tur={{ tur }}{% endif %}{% if kind %}&tur={{ kind }}{% endif %}">Barcha yillar</a>
+  {% for y in years %}
+    <a class="chip{% if y == active_year %} is-active{% endif %}" href="?yil={{ y }}{% if tur %}&tur={{ tur }}{% endif %}">{{ y }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if types %}
+<div class="chips{% if years %}" style="margin-top:-6px{% endif %}">
+  <a class="chip{% if not tur %} is-active{% endif %}" href="?{% if active_year %}yil={{ active_year }}{% endif %}">Barcha turlar</a>
+  {% for val, lbl in types %}
+    <a class="chip{% if tur == val %} is-active{% endif %}" href="?tur={{ val }}{% if active_year %}&yil={{ active_year }}{% endif %}">{{ lbl }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="toolbar">
+  <form method="get" style="display:flex;gap:9px;flex-wrap:wrap">
+    {% if tur %}<input type="hidden" name="tur" value="{{ tur }}">{% endif %}
+    {% if active_year %}<input type="hidden" name="yil" value="{{ active_year }}">{% endif %}
+    <input type="search" name="q" value="{{ q }}" placeholder="{{ title }} bo'yicha qidiruv...">
+    <button class="btn" type="submit">{% svg 'filter' 13 %} Filtrlar</button>
+  </form>
+</div>
+
+<div class="grid {{ grid_class|default:'grid--3' }}">
+  {% for o in page %}
+  <a class="card" href="{{ o.get_absolute_url }}">
+    <div class="card__media">
+      <div class="ph" style="background:{% if o.image %}url('{{ o.image.url }}') center/cover{% elif o.photo %}url('{{ o.photo.url }}') center/cover{% else %}{{ o|title_of|gradient }}{% endif %}"></div>
+      {% if o.date %}<span class="card__year">{{ o.date }}</span>{% elif o.year %}<span class="card__year">{{ o.year }}</span>{% elif o.service_period %}<span class="card__year">{{ o.service_period }}</span>{% endif %}
+      <span class="card__type" style="background:{{ card_color|default:'#1d4ed8' }}">{% firstof o|card_label:type_key card_text %}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ o|title_of }}</div>
+      {% if o.summary %}<div class="card__date">{{ o.summary|truncatechars:70 }}</div>{% elif o.position %}<div class="card__date">{{ o.position }}</div>{% endif %}
+    </div>
+    {% if o.location or o.address or o.doc_number %}
+    <div class="card__loc">{% svg 'pin' 12 %} {% firstof o.location o.address o.doc_number o.service_period %}</div>
+    {% endif %}
+    <div class="card__meta">
+      <span>{% svg 'camera' 12 %} {{ o.photo_count|default:0 }}</span>
+      <span>{% svg 'video' 12 %} {{ o.video_count|default:0 }}</span>
+      <span>{% svg 'file' 12 %} {{ o.doc_count|default:0 }}</span>
+      <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">{{ empty_icon|default:'🗂️' }}</div>{{ title }} bo'yicha ma'lumot topilmadi</div>
+  {% endfor %}
+</div>
+
+{% include "includes/pagination.html" %}
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  {% if panel_title %}
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">{{ panel_title }}</div></div>
+    {% if map %}
+    <div class="map-box"><div class="map-box__dots">
+      <span class="map-box__dot" style="left:30%;top:38%"></span>
+      <span class="map-box__dot" style="left:50%;top:50%"></span>
+      <span class="map-box__dot" style="left:65%;top:44%"></span>
+      <span class="map-box__dot" style="left:42%;top:62%"></span>
+      <span class="map-box__dot" style="left:72%;top:60%"></span>
+    </div></div>
+    {% endif %}
+    {% for r in regions %}
+      <div class="region-row"><span>{% svg 'pin' 12 %} {{ r.name }}</span><b>{{ r.count }}</b></div>
+    {% empty %}
+      <div class="text-muted" style="font-size:12px">Hududlar bo'yicha statistika mavjud emas</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if mini_items %}
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">{{ mini_title|default:"So'nggi qo'shilgan" }}</div></div>
+    <div class="mini-list">
+      {% for m in mini_items %}
+      <a class="mini" href="{{ m.url }}">
+        <span class="mini__img ph" style="background:{% if m.image %}url('{{ m.image.url }}') center/cover{% else %}{{ m.title|gradient }}{% endif %}"></span>
+        <span>
+          <div class="mini__title">{{ m.title|truncatechars:36 }}</div>
+          <div class="mini__sub">{% firstof m.meta m.date m.meta_text %}</div>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</aside>
+{% endblock %}

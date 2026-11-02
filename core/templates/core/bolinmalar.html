@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Bo'linmalar tarixi — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>Bo'linmalar tarixi</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="page-title">Bo'linmalar tarixi</h1>
+  <p class="page-sub">Milliy gvardiya tarkibidagi bo'linmarning tashkil etilishi, rivojlanish bosqichlari, faoliyati va tarixiy ma'lumotlari.</p>
+</section>
+
+<div class="chips">
+  <a class="chip{% if not active_cat %} is-active{% endif %}" href="?">Barcha bo'linmalar</a>
+  {% for c in categories %}
+    <a class="chip{% if active_cat and active_cat.pk == c.pk %} is-active{% endif %}" href="?kategoriya={{ c.slug }}">{{ c.name }}</a>
+  {% endfor %}
+  <a class="chip" href="?">{% svg 'filter' 13 %} Filtrlar</a>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat__icon" style="background:#eab30822;border:1px solid #eab30855">🛡️</div>
+    <div><div class="stat__value">{{ total }}</div><div class="stat__label">Jami bo'linmalar</div></div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon" style="background:#3b82f622;border:1px solid #3b82f655">👥</div>
+    <div><div class="stat__value">{{ hududiy }}</div><div class="stat__label">Hududiy bo'linmalar</div></div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon" style="background:#16a34a22;border:1px solid #16a34a55">🏃</div>
+    <div><div class="stat__value">{{ maxsus }}</div><div class="stat__label">Maxsus bo'linmalar</div></div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon" style="background:#8b5cf622;border:1px solid #8b5cf655">🎓</div>
+    <div><div class="stat__value">{{ talim_count }}</div><div class="stat__label">Ta'lim muassasalari</div></div>
+  </div>
+  <div class="stat">
+    <div class="stat__icon" style="background:#ef444422;border:1px solid #ef444455">➕</div>
+    <div><div class="stat__value">{{ qoshimcha }}</div><div class="stat__label">Qo'shimcha xizmat bo'linmalari</div></div>
+  </div>
+</div>
+
+<div class="grid grid--4">
+  {% for d in page %}
+  <a class="card" href="{{ d.get_absolute_url }}">
+    <div class="card__media" style="aspect-ratio:16/9">
+      <div class="ph" style="background:{% if d.image %}url('{{ d.image.url }}') center/cover{% else %}{{ d.title|gradient }}{% endif %}"></div>
+    </div>
+    <div class="card__head">
+      <div class="card__logo">🛡️</div>
+      <div class="card__title">{{ d.title }}</div>
+      <span class="card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+    <div class="card__meta">
+      <span>{{ d.year_range }}</span>
+    </div>
+    <div class="card__meta" style="border-top:0;padding-top:0">
+      <span>{% svg 'camera' 12 %} {{ d.photo_count }}</span>
+      <span>{% svg 'video' 12 %} {{ d.video_count }}</span>
+      <span>{% svg 'file' 12 %} {{ d.doc_count }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🏛️</div>Bo'linma topilmadi</div>
+  {% endfor %}
+</div>
+
+{% include "includes/pagination.html" %}
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  {% include "includes/panel_timeline.html" with title="So'nggi muhim voqealar" items=latest more_url="/tadbirlar/" %}
+
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title">Hududlar bo'yicha bo'linmalar</div>
+      <a class="panel__more" href="?">Batafsil {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="map-box"><div class="map-box__dots">
+      <span class="map-box__dot" style="left:31%;top:39%"></span>
+      <span class="map-box__dot" style="left:50%;top:51%"></span>
+      <span class="map-box__dot" style="left:65%;top:45%"></span>
+      <span class="map-box__dot" style="left:43%;top:63%"></span>
+      <span class="map-box__dot" style="left:73%;top:61%"></span>
+      <span class="map-box__dot" style="left:25%;top:57%"></span>
+    </div></div>
+    {% for r in regions %}
+      <div class="region-row"><span>{% svg 'pin' 12 %} {{ r.name }}</span><b>{{ r.count }}</b></div>
+    {% endfor %}
+  </div>
+
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title">Ommabop bo'linmalar</div>
+      <a class="panel__more" href="?">Barchasini ko'rish {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="rank-list">
+      {% for d in popular %}
+      <a class="rank" href="{{ d.get_absolute_url }}">
+        <span class="rank__num">{{ forloop.counter }}</span>
+        <span class="rank__img ph" style="background:{% if d.image %}url('{{ d.image.url }}') center/cover{% else %}{{ d.title|gradient }}{% endif %}"></span>
+        <span>
+          <div class="rank__title">{{ d.title }}</div>
+          <div class="rank__sub">{{ d.photo_count|add:d.video_count|add:d.doc_count }} ta material</div>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</aside>
+{% endblock %}

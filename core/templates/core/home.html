@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Bosh sahifa — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  {% svg 'home' 14 %} <span>Bosh sahifa</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="page-title">Milliy gvardiya<br>elektron muzeyi<span style="font-size: 20px;color: red;margin-left: 20px;">  RAQAMLI TARIXIY MEROS · 2017—2026</span></h1>
+  <p class="page-sub">O'zbekiston Respublikasi Milliy gvardiyasining tashkil etilishi, shakllanishi, huquqiy asoslari, islohotlari va xizmat faoliyatiga bag'ishlangan interaktiv raqamli muzey. Tarixiy xotirani saqlash, arxivlarni raqamlashtirish va kelajak avlodga etkazish uchun yagona axborot makoni.</p>
+  <div class="chips" style="margin-bottom:0">
+    <a class="chip is-active" href="{% url 'core:yillar' %}">{% svg 'calendar' 13 %} Yillar bo'yicha tarix</a>
+    <a class="chip" href="{% url 'core:binolar' %}">{% svg 'building' 13 %} Yangi binolar</a>
+    <a class="chip" href="{% url 'core:bolinmalar' %}">{% svg 'shield' 13 %} Bo'linmalar tarixi</a>
+    <a class="chip" href="{% url 'core:galabalar' %}">{% svg 'trophy' 13 %} Erishilgan g'alabalar</a>
+    <a class="chip" href="{% url 'core:yonalishlar' %}">{% svg 'flag' 13 %} 10 ta asosiy yo'nalish</a>
+  </div>
+</section>
+
+{% if stats %}
+<div class="stats">
+  {% for s in stats %}
+  <div class="stat">
+    <div class="stat__icon" style="background:{{ s.color }}22;border:1px solid {{ s.color }}55">{{ s.icon }}</div>
+    <div>
+      <div class="stat__value">{{ s.value }}</div>
+      <div class="stat__label">{{ s.label }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="panel mb-16">
+  <div class="panel__head">
+    <div class="panel__title">Yillar kesimida elektron arxiv</div>
+    <a class="panel__more" href="{% url 'core:yillar' %}">Barchasi {% svg 'arrow' 13 %}</a>
+  </div>
+  <div class="year-strip">
+    {% for y in years %}
+      <a class="year-btn" href="{% url 'core:yil_detail' y %}">{{ y }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<h2 class="section-title" style="margin-top:0">Yangi binolar</h2>
+<div class="grid grid--4 mb-16">
+  {% for b in buildings %}
+  <a class="card" href="{{ b.get_absolute_url }}">
+    <div class="card__media">
+      <div class="ph" style="background:{% if b.image %}url('{{ b.image.url }}') center/cover{% else %}{{ b.title|gradient }}{% endif %}"></div>
+      <span class="card__year">{{ b.year }}</span>
+      <span class="card__type" style="background:#1d4ed8">{{ b.get_building_type_display }}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ b.title }}</div>
+      <div class="card__date">{% svg 'pin' 12 %} {{ b.address|default:b.region }}</div>
+    </div>
+    <div class="card__meta">
+      <span>{% svg 'camera' 12 %} {{ b.photo_count }}</span>
+      <span>{% svg 'video' 12 %} {{ b.video_count }}</span>
+      <span>{% svg 'file' 12 %} {{ b.doc_count }}</span>
+      <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🏗️</div>Yangi binolar topilmadi</div>
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Bo'linmalar tarixi</h2>
+<div class="grid grid--4 mb-16">
+  {% for d in departments %}
+  <a class="card" href="{{ d.get_absolute_url }}">
+    <div class="card__media" style="aspect-ratio:16/9">
+      <div class="ph" style="background:{% if d.image %}url('{{ d.image.url }}') center/cover{% else %}{{ d.title|gradient }}{% endif %}"></div>
+    </div>
+    <div class="card__head">
+      <div class="card__logo">🛡️</div>
+      <div class="card__title">{{ d.title }}</div>
+      <span class="card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+    <div class="card__meta">
+      <span>{{ d.year_range }}</span>
+    </div>
+    <div class="card__meta" style="border-top:0;padding-top:0">
+      <span>{% svg 'camera' 12 %} {{ d.photo_count }}</span>
+      <span>{% svg 'video' 12 %} {{ d.video_count }}</span>
+      <span>{% svg 'file' 12 %} {{ d.doc_count }}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🏛️</div>Bo'linmalar topilmadi</div>
+  {% endfor %}
+</div>
+
+<h2 class="section-title">Erishilgan g'alabalar</h2>
+<div class="grid grid--3">
+  {% for a in achievements %}
+  <a class="card" href="{{ a.get_absolute_url }}">
+    <div class="card__media">
+      <div class="ph" style="background:{% if a.image %}url('{{ a.image.url }}') center/cover{% else %}{{ a.title|gradient }}{% endif %}"></div>
+      <span class="card__type" style="background:#b45309">{{ a.get_achievement_type_display }}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ a.title }}</div>
+      <div class="card__date">{{ a.date }}</div>
+    </div>
+    <div class="card__meta">
+      <span>{% svg 'camera' 12 %} {{ a.photo_count }}</span>
+      <span>{% svg 'video' 12 %} {{ a.video_count }}</span>
+      <span>{% svg 'file' 12 %} {{ a.doc_count }}</span>
+      <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🏆</div>G'alabalar topilmadi</div>
+  {% endfor %}
+</div>
+
+{% if events %}
+<h2 class="section-title">So'nggi tadbirlar</h2>
+<div class="grid grid--3">
+  {% for e in events %}
+  <a class="card" href="{{ e.get_absolute_url }}">
+    <div class="card__media">
+      <div class="ph" style="background:{% if e.image %}url('{{ e.image.url }}') center/cover{% else %}{{ e.title|gradient }}{% endif %}"></div>
+      <span class="card__type" style="background:#0f766e">{{ e.get_event_type_display }}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ e.title }}</div>
+      <div class="card__date">{{ e.date }} · {{ e.location }}</div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  {% include "includes/panel_timeline.html" with title="So'nggi muhim voqealar" items=latest more_url="/galabalar/" %}
+
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title">Hududlar bo'yicha binolar</div>
+      <a class="panel__more" href="{% url 'core:binolar' %}">Batafsil {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="map-box"><div class="map-box__dots">
+      <span class="map-box__dot" style="left:32%;top:38%"></span>
+      <span class="map-box__dot" style="left:52%;top:52%"></span>
+      <span class="map-box__dot" style="left:66%;top:44%"></span>
+      <span class="map-box__dot" style="left:44%;top:64%"></span>
+      <span class="map-box__dot" style="left:74%;top:62%"></span>
+      <span class="map-box__dot" style="left:24%;top:56%"></span>
+    </div></div>
+    {% for r in regions %}
+      <div class="region-row"><span>{% svg 'pin' 12 %} {{ r.name }}</span><b>{{ r.count }}</b></div>
+    {% endfor %}
+  </div>
+
+  {% if popular_departments %}
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title">Ommabop bo'linmalar</div>
+      <a class="panel__more" href="{% url 'core:bolinmalar' %}">Barchasini ko'rish {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="rank-list">
+      {% for d in popular_departments %}
+      <a class="rank" href="{{ d.get_absolute_url }}">
+        <span class="rank__num">{{ forloop.counter }}</span>
+        <span class="rank__img ph" style="background:{% if d.image %}url('{{ d.image.url }}') center/cover{% else %}{{ d.title|gradient }}{% endif %}"></span>
+        <span>
+          <div class="rank__title">{{ d.title }}</div>
+          <div class="rank__sub">{{ d.photo_count|add:d.video_count|add:d.doc_count }} ta material</div>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</aside>
+{% endblock %}

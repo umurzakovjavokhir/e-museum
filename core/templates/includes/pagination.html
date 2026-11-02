@@ -1,0 +1,21 @@
+{% load mg_tags %}{% if page.paginator.num_pages > 1 %}
+<nav class="pagination">
+  {% if page.has_previous %}
+    <a href="?{{ request.GET.urlencode }}&page={{ page.previous_page_number }}">{% svg 'chevL' 14 %}</a>
+  {% endif %}
+
+  {% for num in page.paginator.page_range %}
+    {% if page.number == num %}
+      <span class="is-current">{{ num }}</span>
+    {% elif num == 1 or num == page.paginator.num_pages or num > page.number|add:'-3' and num < page.number|add:'3' %}
+      <a href="?{{ request.GET.urlencode }}&page={{ num }}">{{ num }}</a>
+    {% elif num == page.number|add:'-3' or num == page.number|add:'3' %}
+      <span>…</span>
+    {% endif %}
+  {% endfor %}
+
+  {% if page.has_next %}
+    <a href="?{{ request.GET.urlencode }}&page={{ page.next_page_number }}">{% svg 'chev' 14 %}</a>
+  {% endif %}
+</nav>
+{% endif %}

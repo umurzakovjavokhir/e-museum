@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}Saqlanganlar — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>Saqlanganlar</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="page-title">Saqlanganlar</h1>
+  <p class="page-sub">Siz saqlagan materiallar ro'yxati. Har qanday material sahifasidagi «Saqlash» tugmasi orqali shu yerga qo'shiladi.</p>
+</section>
+
+<div class="chips">
+  <span class="text-muted" style="font-size:12.5px"><b class="text-accent">{{ total }}</b> ta saqlangan material</span>
+</div>
+
+<div class="grid grid--3">
+  {% for it in items %}
+  <a class="card" href="{{ it.url }}">
+    <div class="card__media" style="aspect-ratio:16/9">
+      <div class="ph" style="background:{% if it.image %}url('{{ it.image.url }}') center/cover{% else %}{{ it.title|gradient }}{% endif %}"></div>
+      <span class="card__type" style="background:#1d4ed8">{{ it.kind }}</span>
+    </div>
+    <div class="card__body">
+      <div class="card__title">{{ it.title }}</div>
+    </div>
+    <div class="card__meta">
+      <form method="post" action="{% url 'core:bookmark_toggle' %}" onsubmit="return confirm('Saqlanganlardan olib tashlansinmi?')">
+        {% csrf_token %}
+        <input type="hidden" name="ctype" value="{{ it.ctype }}">
+        <input type="hidden" name="oid" value="{{ it.obj.pk }}">
+        <input type="hidden" name="next" value="{% url 'core:saqlanganlar' %}">
+        <button class="btn" type="submit" style="padding:5px 10px">{% svg 'bookmark' 12 %} Olib tashlash</button>
+      </form>
+      <span class="push card__arrow">{% svg 'arrow' 13 %}</span>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1">
+    <div class="empty__icon">🔖</div>
+    Saqlangan materiallar yo'q
+    <div style="margin-top:14px"><a class="btn btn--primary" href="{% url 'core:binolar' %}">{% svg 'building' 14 %} Binolar bo'limiga o'tish</a></div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

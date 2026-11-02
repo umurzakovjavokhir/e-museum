@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load mg_tags humanize %}
+
+{% block title %}{{ obj|title_of }} — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  {% for crumb in breadcrumbs %}
+    <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+    {% if crumb.url %}<a href="{{ crumb.url }}">{{ crumb.title }}</a>{% else %}<span>{{ crumb.title }}</span>{% endif %}
+  {% endfor %}
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="detail-top">
+  <div>
+    {% if badge %}<span class="detail-badge" style="background:{{ badge_color|default:'#1d4ed8' }}">{{ badge }}</span>{% endif %}
+    <h1 class="page-title" style="font-size:30px">{{ obj|title_of }}</h1>
+  </div>
+  <div class="detail-actions">
+    <button class="btn">{% svg 'share' 14 %} Ulashish</button>
+    {% if bookmark %}
+    <form method="post" action="{% url 'core:bookmark_toggle' %}">
+      {% csrf_token %}
+      <input type="hidden" name="ctype" value="{{ bookmark }}">
+      <input type="hidden" name="oid" value="{{ obj.pk }}">
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <button class="btn" type="submit">{% svg 'bookmark' 14 %} Saqlash</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+{% if meta %}
+<div class="meta-row">
+  {% for m in meta %}
+    <span>{% svg m.icon 15 %} <b>{{ m.value }}</b></span>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if gallery %}
+<div class="gallery mb-16">
+  <div class="gallery__main">
+    <div class="ph" style="background:{% if obj.image %}url('{{ obj.image.url }}') center/cover{% else %}{{ obj.title|gradient }}{% endif %}"></div>
+    <button class="gallery__nav gallery__nav--prev">{% svg 'chevL' 17 %}</button>
+    <button class="gallery__nav gallery__nav--next">{% svg 'chev' 17 %}</button>
+    <span class="gallery__counter">1 / {{ gallery|length }}</span>
+  </div>
+  <div class="thumbs">
+    {% for g in gallery %}
+      <span class="thumb{% if forloop.first %} is-active{% endif %}" data-src="{% if g.image %}{{ g.image.url }}{% endif %}">
+        <span class="ph" style="display:block;background:{% if g.image %}url('{{ g.image.url }}') center/cover{% else %}{{ g.title|gradient }}{% endif %}"></span>
+      </span>
+    {% endfor %}
+  </div>
+</div>
+{% elif obj.image %}
+<div class="gallery mb-16">
+  <div class="gallery__main">
+    <div class="ph" style="background:url('{{ obj.image.url }}') center/cover"></div>
+  </div>
+</div>
+{% elif obj.photo %}
+<div class="gallery mb-16">
+  <div class="gallery__main">
+    <div class="ph" style="background:url('{{ obj.photo.url }}') center/cover"></div>
+  </div>
+</div>
+{% endif %}
+
+<h2 class="section-title" style="margin-top:0">Tavsif</h2>
+<div class="prose">
+  {% if obj.description %}
+    {% for p in obj.description|lines %}<p>{{ p }}</p>{% endfor %}
+  {% elif obj.bio %}
+    {% for p in obj.bio|lines %}<p>{{ p }}</p>{% endfor %}
+  {% else %}
+    <p>{{ obj.summary|default:"Ma'lumot kiritilmagan." }}</p>
+  {% endif %}
+  {% if obj.body %}
+    {% for p in obj.body|lines %}<p>{{ p }}</p>{% endfor %}
+  {% endif %}
+</div>
+
+{% if highlights %}
+<h2 class="section-title">Asosiy natijalar va imkoniyatlar</h2>
+<div class="highlights">
+  {% for h in highlights %}
+  <div>
+    <div class="highlight__icon">{{ h.icon }}</div>
+    <div class="highlight__title">{{ h.title }}</div>
+    <div class="highlight__text">{{ h.text }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block rightbar %}
+<aside class="rpanel">
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">Asosiy ma'lumotlar</div></div>
+    <div class="info-list">
+      {% for item in info %}
+      <div class="info-item">
+        <div class="info-item__icon">{% svg item.icon 16 %}</div>
+        <div>
+          <div class="info-item__label">{{ item.label }}</div>
+          <div class="info-item__value">{{ item.value }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if tags %}
+  <div class="panel">
+    <div class="panel__head"><div class="panel__title">Teglar</div></div>
+    <div class="tags">
+      {% for t in tags %}<span class="tag">#{{ t }}</span>{% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="panel">
+    <div class="panel__head">
+      <div class="panel__title">Tegishli materiallar</div>
+      <a class="panel__more" href="{{ related_url|default:'/' }}">Barchasini ko'rish {% svg 'arrow' 13 %}</a>
+    </div>
+    <div class="mini-list">
+      {% for m in related %}
+      <a class="mini" href="{{ m.url }}">
+        <span class="mini__img ph" style="background:{% if m.image %}url('{{ m.image.url }}') center/cover{% else %}{{ m.title|gradient }}{% endif %}"></span>
+        <span>
+          <div class="mini__title">{{ m.title|truncatechars:34 }}</div>
+          <div class="mini__sub">{% if m.duration %}{% svg 'clock' 11 %} {{ m.duration }} &nbsp;{% endif %}{% if m.date %}{% svg 'calendar' 11 %} {{ m.date }}{% elif m.meta %}{{ m.meta }}{% endif %}</div>
+        </span>
+      </a>
+      {% empty %}
+      <div class="text-muted" style="font-size:12px">Material topilmadi</div>
+      {% endfor %}
+    </div>
+  </div>
+</aside>
+{% endblock %}

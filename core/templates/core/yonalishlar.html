@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load mg_tags %}
+
+{% block title %}10 ta asosiy yo'nalish — {{ SITE_TITLE }}{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb">
+  <a href="{% url 'core:home' %}">{% svg 'home' 13 %} Bosh sahifa</a>
+  <span class="breadcrumb__sep">{% svg 'chev' 12 %}</span>
+  <span>10 ta asosiy yo'nalish</span>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="hero hero--gold">
+  <h1 class="page-title">10 ta asosiy yo'nalish</h1>
+  <p class="page-sub">Milliy gvardiya elektron tarixiy muzeyining asosiy ekspozitsiya yo'nalishlari — tashkil etilishidan tortib bugungi kungacha bo'lgan tarixiy hujjatlar va ma'lumotlar shu yo'nalishlar bo'yicha tashkil etilgan.</p>
+</section>
+
+<div class="grid grid--2">
+  {% for d in directions %}
+  <a class="card" style="padding:18px 20px;display:block;text-decoration:none;color:inherit" href="{% url d.url|default:'core:yonalishlar' %}">
+    <div style="display:flex;gap:16px">
+      <div class="dir__num" style="border-color:#2a4775;color:var(--gold)">{{ d.number|stringformat:"02d" }}</div>
+      <div>
+        <div class="dir__title" style="font-size:15px;font-weight:800;margin-bottom:6px">{{ d.title }}</div>
+        <div class="text-muted" style="font-size:12.5px;line-height:1.6">{{ d.description }}</div>
+      </div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="empty" style="grid-column:1/-1"><div class="empty__icon">🧭</div>Bo'limlar topilmadi</div>
+  {% endfor %}
+</div>
+{% endblock %}
